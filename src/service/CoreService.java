@@ -67,6 +67,11 @@ public class CoreService {
 					//将图文消息对象转换成xml字符串
 					respMessage = MessageUtil.newsMessageToXml(newsMessage);
 				}
+				else if("100".equals(reqContent)){
+					String openid = fromUserName;
+					GetAbsentAll getAbsentAll = new GetAbsentAll();
+					String str = getAbsentAll.getAbsentCount(openid);
+				}
 				
 //				respContent = "您发送的是文本消息！";
 			}
