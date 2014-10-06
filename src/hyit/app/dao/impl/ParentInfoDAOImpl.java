@@ -21,7 +21,17 @@ public class ParentInfoDAOImpl implements IParentInfoDAO {
 	@Override
 	public boolean doCreate(ParentInfo info) throws Exception {
 		// TODO Auto-generated method stub
-		return false;
+		
+		boolean flag = false;
+		String sql = "INSERT INTO parent_info VALUES(null,null,?,?,null,null)";
+		this.pstmt = this.conn.prepareStatement(sql);
+		this.pstmt.setLong(1, info.getStudentNumber());
+		this.pstmt.setString(2,info.getOpenid());
+		if (this.pstmt.executeUpdate() > 0) {
+			flag = true;
+		}
+		this.pstmt.close();
+		return flag;
 	}
 
 	@Override
@@ -60,6 +70,20 @@ public class ParentInfoDAOImpl implements IParentInfoDAO {
 	public List<ParentInfo> getAll() throws Exception {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean search(String openid) throws Exception {
+		// TODO Auto-generated method stub
+		ParentInfo info = null;
+		String sql = "select * from parent_info where openid = ?";
+		this.pstmt = this.conn.prepareStatement(sql);
+		this.pstmt.setString(1, openid);
+		ResultSet rs = this.pstmt.executeQuery();
+		while(rs.next()){
+			return true;
+		}
+		return false;
 	}
 
 }

@@ -19,7 +19,18 @@ public class ParentInfoDAOProxy implements IParentInfoDAO {
 	@Override
 	public boolean doCreate(ParentInfo info) throws Exception {
 		// TODO Auto-generated method stub
-		return false;
+		boolean flag = false;
+		try {
+			if (this.dao.getByOpenid(info.getOpenid()) == null) {
+				flag = this.dao.doCreate(info);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			throw e;
+		} finally {
+			this.dbc.close();
+		}
+		return flag;
 	}
 
 	@Override
@@ -52,6 +63,23 @@ public class ParentInfoDAOProxy implements IParentInfoDAO {
 	public List<ParentInfo> getAll() throws Exception {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean search(String openid) throws Exception {
+		// TODO Auto-generated method stub
+		boolean flag = false;
+		try {
+			if (this.dao.getByOpenid(openid) == null) {
+				flag = this.dao.search(openid);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			throw e;
+		} finally {
+			this.dbc.close();
+		}
+		return flag;
 	}
 
 }

@@ -8,6 +8,8 @@ public interface IParentInfoDAO {
 	public boolean doCreate(ParentInfo info) throws Exception;
 
 	public boolean update(ParentInfo info) throws Exception;
+	
+	public boolean search(String openid) throws Exception;
 
 	public ParentInfo delete(Integer number) throws Exception;
 

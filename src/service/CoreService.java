@@ -1,5 +1,12 @@
 package service;
 
+import hyit.app.factory.DAOFactory;
+import hyit.app.model.ParentInfo;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,15 +14,28 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+
 import message.resp.Article;
 import message.resp.NewsMessage;
 import message.resp.TextMessage;
 import util.MessageUtil;
 
 public class CoreService {
+	private static final String dbUrl = "jdbc:mysql://localhost:3306/attendanceV2";
+	private static final String dbUser = "root";
+	private static final String dbPwd = "nicai";
+	//防SQL注入
+	public static String TransactSQLInjection(String str)
 
+    {
+
+          return str.replaceAll(".*([';]+|(--)+).*", " ");
+
+    }
+	
 	public static String processRequest(HttpServletRequest request) {
 		// TODO Auto-generated method stub
+		
 		String respMessage = null;
 		try{
 			//默认返回的文本消息内容
@@ -67,10 +87,78 @@ public class CoreService {
 					//将图文消息对象转换成xml字符串
 					respMessage = MessageUtil.newsMessageToXml(newsMessage);
 				}
+				else if(reqContent.startsWith("AA")){
+					String reqStudentId = reqContent.substring(2);
+					Class.forName("com.mysql.jdbc.Driver").newInstance();
+					Connection conn = null;
+					conn =  DriverManager.getConnection(dbUrl, dbUser, dbPwd);
+					reqStudentId = TransactSQLInjection(reqStudentId);
+					String sql = "select * from student_info where student_number = '"+ reqStudentId +"'";
+					Statement stmt;
+					stmt = conn.createStatement();
+					ResultSet result = stmt.executeQuery(sql);
+					
+					boolean flag = false;
+					while(result.next()){
+						flag = true;
+						
+						//删除之前定制的学号
+						stmt = conn.createStatement();
+						stmt.executeUpdate("delete from parent_info where openid = '" + fromUserName + "'");
+						//定制新的学号
+						Decrition decrition = new Decrition();
+						respContent = decrition.subSuccess();
+						
+					}
+					result.close();
+					stmt.close();
+					conn.close();
+					if(!flag){
+						respContent = "请输入正确的学号！";
+					}
+					
+					
+					textMessage.setContent(respContent);
+					respMessage = MessageUtil.textMessageToXml(textMessage);
+					
+					
+				}
 				else if("100".equals(reqContent)){
+					
+					ServiceFunction className = new ServiceFunction();
+					Class.forName("com.mysql.jdbc.Driver").newInstance();
+					Connection conn = null;
+					conn = DriverManager.getConnection(dbUrl, dbUser, dbPwd);
+					Statement stmt;
+					stmt = conn.createStatement();
+					ResultSet rs = stmt.executeQuery("select * from parent_info where openid = '"+ fromUserName +"'");
+					boolean opposite = true;
+					while(rs.next() && opposite){
+						opposite = false;
+						respContent = className.getClassName(rs.getString("studentid"));
+					}
+					rs.close();
+					stmt.close();
+					conn.close();
+					
+					textMessage.setContent(respContent);
+					respMessage = MessageUtil.textMessageToXml(textMessage);
+					
+					
+				}
+				else if("101".equals(reqContent)){
 					String openid = fromUserName;
 					GetAbsentAll getAbsentAll = new GetAbsentAll();
 					String str = getAbsentAll.getAbsentCount(openid);
+					respContent = str;
+					textMessage.setContent(respContent);
+					respMessage = MessageUtil.textMessageToXml(textMessage);
+				}
+				else{
+					Decrition decrition = new Decrition();
+					respContent = decrition.getFirstCustomize();
+					textMessage.setContent(respContent);
+					respMessage = MessageUtil.textMessageToXml(textMessage);
 				}
 				
 //				respContent = "您发送的是文本消息！";
@@ -97,7 +185,11 @@ public class CoreService {
 				String eventType = requestMap.get("Event");
 				// 订阅
 				if (eventType.equals(MessageUtil.EVENT_TYPE_SUBSCRIBE)) {
-					respContent = "谢谢您的关注！";
+					
+					Decrition decrition = new Decrition();
+					respContent = decrition.getCustomizeMenu();
+					textMessage.setContent(respContent);
+					respMessage = MessageUtil.textMessageToXml(textMessage);
 				}
 				// 取消订阅
 				else if (eventType.equals(MessageUtil.EVENT_TYPE_UNSUBSCRIBE)) {

@@ -12,7 +12,7 @@ import hyit.app.model.SessionInfo;
 import hyit.app.model.SubjectInfo;
 
 public class Test {
-	public static long getStudentNumber(String openid){
+	public static  long getStudentNumber(String openid){
 		ParentInfo parent = new ParentInfo();
 		Long studentNumber = null;
 		try{

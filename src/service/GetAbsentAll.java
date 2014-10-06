@@ -47,6 +47,7 @@ public class GetAbsentAll {
 		
 		Iterator<SubjectInfo> iter = list.iterator();
 		while(iter.hasNext()){
+			count = 0;
 			subject = iter.next();
 			subjectName = subject.getName();
 			subjectNumber = subject.getSubjectNumber();
@@ -90,7 +91,7 @@ public class GetAbsentAll {
 						cron = iterCron.next();
 						cronNumber = cron.getCronNumber();
 						//统计考勤缺勤
-						if(cron.getStatus()==1){//计划标志
+						if(cron.getStatus()!=0){//计划标志
 							CheckInfo check = new CheckInfo();
 							List<CheckInfo> listCheck = null;
 							try{
